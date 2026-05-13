@@ -1,0 +1,93 @@
+name: Node.js Subdomain Enumerator
+
+on:
+  schedule:
+    # Run every 12 hours
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Target domain'
+        required: true
+        default: 'example.com'
+      wordlist:
+        description: 'Custom wordlist URL (optional)'
+        required: false
+        default: ''
+      threads:
+        description: 'Number of threads'
+        required: false
+        default: '50'
+      securitytrails_key:
+        description: 'SecurityTrails API key (optional)'
+        required: false
+      virustotal_key:
+        description: 'VirusTotal API key (optional)'
+        required: false
+
+jobs:
+  enumerate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install commander
+    
+    - name: Create wordlist file
+      if: github.event.inputs.wordlist != ''
+      run: |
+        curl -L "${{ github.event.inputs.wordlist }}" -o custom_wordlist.txt
+    
+    - name: Run subdomain enumeration
+      env:
+        ST_API_KEY: ${{ secrets.SECURITYTRAILS_API_KEY || github.event.inputs.securitytrails_key }}
+        VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY || github.event.inputs.virustotal_key }}
+      run: |
+        node subdomain_enum.js \
+          -d "${{ github.event.inputs.domain }}" \
+          ${CUSTOM_WORDLIST:+-w custom_wordlist.txt} \
+          -t "${{ github.event.inputs.threads }}" \
+          ${ST_API_KEY:+--st-api $ST_API_KEY} \
+          ${VT_API_KEY:+--vt-api $VT_API_KEY} \
+          2>&1 | tee results.txt
+    
+    - name: Parse JSON results
+      id: parse_results
+      run: |
+        # Extract subdomains and save as JSON for later use
+        grep -E '^- [a-zA-Z0-9.-]+' results.txt | \
+          sed 's/^- //' | \
+          jq -R . | jq -s . > subdomains.json
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: nodejs-subdomain-results
+        path: |
+          results.txt
+          subdomains.json
+        retention-days: 14
+    
+    - name: Create security dashboard (optional)
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        publish_branch: security-dashboard
+        keep_files: true
+        destination_dir: subdomain-reports
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: 'Update subdomain enumeration report for ${{ github.event.inputs.domain }}'
