@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 Hacker Cat Web3 - 100 Ethical Hacking Projects</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --panel: #111118;
+            --border: #1a1a2e;
+            --green: #00ff41;
+            --green-dim: #00cc33;
+            --purple: #b347ea;
+            --cyan: #00e5ff;
+            --pink: #ff2d95;
+            --yellow: #ffd700;
+            --text: #c8c8d0;
+            --text-dim: #6a6a7a;
+            --red: #ff3344;
+            --orange: #ff8c00;
+            --font-mono: 'Courier New', 'Fira Code', 'Consolas', monospace;
+            --font-display: 'Segoe UI', system-ui, sans-serif;
+            --glow-green: 0 0 20px rgba(0, 255, 65, 0.4);
+            --glow-purple: 0 0 20px rgba(179, 71, 234, 0.4);
+            --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.35);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-display);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Matrix Rain Canvas */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.12;
+        }
+
+        /* Main App Container */
+        #app {
+            position: relative;
+            z-index: 1;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 10px 20px 40px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 18px 24px;
+            margin-bottom: 20px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 255, 65, 0.03), transparent, rgba(179, 71, 234, 0.03), transparent);
+            animation: headerGlow 8s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes headerGlow {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        .cat-hacker {
+            font-size: 52px;
+            animation: catBounce 2s ease-in-out infinite;
+            cursor: pointer;
+            user-select: none;
+            filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.6));
+            transition: transform 0.2s;
+        }
+        .cat-hacker:hover {
+            animation: catGlitch 0.3s ease-in-out;
+        }
+        @keyframes catBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-8px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            70% {
+                transform: translateY(-4px);
+            }
+        }
+        @keyframes catGlitch {
+            0%,
+            100% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-3px, 2px) skew(-2deg);
+            }
+            40% {
+                transform: translate(3px, -2px) skew(2deg);
+            }
+            60% {
+                transform: translate(-2px, -1px);
+            }
+            80% {
+                transform: translate(2px, 1px);
+            }
+        }
+
+        .title-block {
+            position: relative;
+            z-index: 1;
+        }
+        .title-block h1 {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            color: var(--green);
+            text-shadow: var(--glow-green);
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+        .title-block .subtitle {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--purple);
+            letter-spacing: 2px;
+        }
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .glitch-text::before {
+            color: var(--pink);
+            animation: glitchShift 3s infinite;
+            clip-path: inset(0 0 60% 0);
+            z-index: -1;
+        }
+        .glitch-text::after {
+            color: var(--cyan);
+            animation: glitchShift 3s infinite reverse;
+            clip-path: inset(40% 0 0 0);
+            z-index: -1;
+        }
+        @keyframes glitchShift {
+            0%,
+            100% {
+                transform: translate(0);
+            }
+            92% {
+                transform: translate(0);
+            }
+            93% {
+                transform: translate(-3px, 1px);
+            }
+            94% {
+                transform: translate(3px, -1px);
+            }
+            95% {
+                transform: translate(0);
+            }
+        }
+
+        /* Web3 Connect Button */
+        .web3-connect {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-connect {
+            padding: 10px 20px;
+            border: 2px solid var(--purple);
+            background: transparent;
+            color: var(--purple);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 30px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+        .btn-connect:hover {
+            background: var(--purple);
+            color: #000;
+            box-shadow: var(--glow-purple);
+            transform: scale(1.04);
+        }
+        .btn-connect.connected {
+            border-color: var(--green);
+            color: var(--green);
+            background: rgba(0, 255, 65, 0.08);
+            box-shadow: var(--glow-green);
+        }
+        .btn-connect.connected:hover {
+            background: var(--green);
+            color: #000;
+        }
+        .wallet-address {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            background: var(--panel);
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+        .wallet-address.show {
+            display: block;
+            animation: fadeSlideIn 0.4s ease;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 100px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: default;
+        }
+        .stat-card:hover {
+            border-color: var(--green);
+            box-shadow: var(--glow-green);
+            transform: translateY(-2px);
+        }
+        .stat-card .stat-num {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--green);
+            text-shadow: var(--glow-green);
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .stat-card.purple .stat-num {
+            color: var(--purple);
+            text-shadow: var(--glow-purple);
+        }
+        .stat-card.purple:hover {
+            border-color: var(--purple);
+            box-shadow: var(--glow-purple);
+        }
+        .stat-card.cyan .stat-num {
+            color: var(--cyan);
+            text-shadow: var(--glow-cyan);
+        }
+        .stat-card.cyan:hover {
+            border-color: var(--cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* ===== CATEGORY TABS ===== */
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .cat-tab {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            border-radius: 25px;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            white-space: nowrap;
+            position: relative;
+        }
+        .cat-tab:hover {
+            border-color: var(--green-dim);
+            color: var(--green);
+        }
+        .cat-tab.active {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--green);
+            color: var(--green);
+            box-shadow: var(--glow-green);
+            font-weight: bold;
+        }
+        .cat-tab .badge {
+            display: inline-block;
+            background: var(--border);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            margin-left: 6px;
+        }
+        .cat-tab.active .badge {
+            background: rgba(0, 255, 65, 0.25);
+        }
+
+        /* ===== PROJECTS CONTAINER ===== */
+        .projects-container {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .projects-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .projects-header h2 {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--green);
+            letter-spacing: 1px;
+        }
+        .search-input {
+            padding: 8px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            border-radius: 20px;
+            width: 220px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            border-color: var(--green);
+            box-shadow: var(--glow-green);
+            width: 280px;
+        }
+        .search-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .project-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .project-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .project-list::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        .project-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        .project-list::-webkit-scrollbar-thumb:hover {
+            background: var(--green-dim);
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            animation: fadeSlideIn 0.3s ease forwards;
+            opacity: 0;
+        }
+        .project-item:nth-child(1) {
+            animation-delay: 0.01s;
+        }
+        .project-item:nth-child(2) {
+            animation-delay: 0.02s;
+        }
+        .project-item:nth-child(3) {
+            animation-delay: 0.03s;
+        }
+        .project-item:nth-child(4) {
+            animation-delay: 0.04s;
+        }
+        .project-item:nth-child(5) {
+            animation-delay: 0.05s;
+        }
+        .project-item:nth-child(6) {
+            animation-delay: 0.06s;
+        }
+        .project-item:nth-child(7) {
+            animation-delay: 0.07s;
+        }
+        .project-item:nth-child(8) {
+            animation-delay: 0.08s;
+        }
+        .project-item:nth-child(9) {
+            animation-delay: 0.09s;
+        }
+        .project-item:nth-child(10) {
+            animation-delay: 0.1s;
+        }
+        .project-item:nth-child(11) {
+            animation-delay: 0.11s;
+        }
+        .project-item:nth-child(12) {
+            animation-delay: 0.12s;
+        }
+        .project-item:nth-child(13) {
+            animation-delay: 0.13s;
+        }
+        .project-item:nth-child(14) {
+            animation-delay: 0.14s;
+        }
+        .project-item:nth-child(15) {
+            animation-delay: 0.15s;
+        }
+        .project-item:hover {
+            background: rgba(0, 255, 65, 0.04);
+            border-color: var(--border);
+            transform: translateX(4px);
+        }
+        .project-num {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--purple);
+            min-width: 28px;
+            text-align: center;
+            background: rgba(179, 71, 234, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .project-name {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text);
+            flex: 1;
+        }
+        .project-item:hover .project-name {
+            color: var(--green);
+        }
+        .project-icon {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        /* ===== TERMINAL FOOTER ===== */
+        .terminal-footer {
+            margin-top: 20px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: var(--font-mono);
+        }
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red {
+            background: #ff5f56;
+        }
+        .terminal-dot.yellow {
+            background: #ffbd2e;
+        }
+        .terminal-dot.green {
+            background: #27c93f;
+        }
+        .terminal-title {
+            font-size: 0.7rem;
+            color: #555;
+            margin-left: 8px;
+        }
+        .terminal-body {
+            padding: 14px;
+            font-size: 0.75rem;
+            color: var(--green);
+            line-height: 1.6;
+            min-height: 60px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .terminal-body .prompt {
+            color: var(--purple);
+        }
+        .terminal-body .cursor {
+            animation: blink 1s step-end infinite;
+            color: var(--green);
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+        .terminal-body .output-line {
+            color: var(--text-dim);
+        }
+        .terminal-body .output-highlight {
+            color: var(--cyan);
+        }
+
+        /* ===== TOAST / NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+            background: var(--panel);
+            border: 1px solid var(--green);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--green);
+            box-shadow: var(--glow-green);
+            animation: toastIn 0.4s ease, toastOut 0.4s ease 2.5s forwards;
+            max-width: 350px;
+        }
+        @keyframes toastIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes toastOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: var(--panel);
+            border: 2px solid var(--purple);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--glow-purple);
+            animation: modalPop 0.4s ease;
+        }
+        @keyframes modalPop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .modal .big-cat {
+            font-size: 80px;
+            animation: catBounce 1s ease-in-out infinite;
+        }
+        .modal h3 {
+            font-family: var(--font-mono);
+            color: var(--purple);
+            margin: 12px 0;
+            font-size: 1.2rem;
+        }
+        .modal p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .modal .btn-close {
+            padding: 10px 24px;
+            border: 2px solid var(--purple);
+            background: transparent;
+            color: var(--purple);
+            font-family: var(--font-mono);
+            cursor: pointer;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+        .modal .btn-close:hover {
+            background: var(--purple);
+            color: #000;
+            box-shadow: var(--glow-purple);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .title-block h1 {
+                font-size: 1.1rem;
+            }
+            .cat-hacker {
+                font-size: 40px;
+            }
+            .category-tabs {
+                gap: 5px;
+            }
+            .cat-tab {
+                font-size: 0.65rem;
+                padding: 7px 10px;
+            }
+            .search-input {
+                width: 100%;
+            }
+            .search-input:focus {
+                width: 100%;
+            }
+            .stats-bar {
+                gap: 6px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+            }
+            .stat-card .stat-num {
+                font-size: 1.4rem;
+            }
+            .project-item {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            .project-name {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* HIDDEN EASTER EGG - Konami code-ish */
+        .easter-egg-activated .cat-hacker {
+            animation: ultraSpin 0.5s ease-in-out;
+            font-size: 100px;
+        }
+        @keyframes ultraSpin {
+            0% {
+                transform: rotate(0) scale(1);
+            }
+            50% {
+                transform: rotate(360deg) scale(1.5);
+            }
+            100% {
+                transform: rotate(720deg) scale(1);
+            }
+        }
+
+        /* Copy ripple */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 255, 65, 0.3);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Main App -->
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-area">
+                <span class="cat-hacker" id="catMascot" title="Click me for a surprise! 🐱">🐱‍💻</span>
+                <div class="title-block">
+                    <h1 class="glitch-text" data-text="HACKER_CAT_WEB3">HACKER_CAT_WEB3</h1>
+                    <p class="subtitle">✦ 100 Ethical Hacking Projects ✦</p>
+                </div>
+            </div>
+            <div class="web3-connect">
+                <span class="wallet-address" id="walletAddress">0xCat...H4CK</span>
+                <button class="btn-connect" id="btnConnect" onclick="toggleWallet()">
+                    ⚡ Connect Wallet
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-num">100</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-num">9</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-card cyan">
+                <div class="stat-num" id="filteredCount">100</div>
+                <div class="stat-label">Visible</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">🐱</div>
+                <div class="stat-label">Cat Hacker</div>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs" id="categoryTabs">
+            <!-- Dynamically filled -->
+        </div>
+
+        <!-- Projects -->
+        <div class="projects-container">
+            <div class="projects-header">
+                <h2>📋 > Projects_List</h2>
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search projects..." oninput="filterProjects()">
+            </div>
+            <div class="project-list" id="projectList">
+                <!-- Dynamically filled -->
+            </div>
+        </div>
+
+        <!-- Terminal Footer -->
+        <div class="terminal-footer">
+            <div class="terminal-header">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot yellow"></span>
+                <span class="terminal-dot green"></span>
+                <span class="terminal-title">hacker_cat@web3:~</span>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <span class="prompt">root@hackercat:~$ </span> ./init_web3.sh<br>
+                <span class="output-line">[INFO] Booting Hacker Cat OS v4.2.0...</span><br>
+                <span class="output-line">[INFO] Loading <span class="output-highlight">100 ethical hacking modules</span>...</span><br>
+                <span class="output-line">[INFO] Connecting to <span class="output-highlight">Web3 Nyan Network</span>...</span><br>
+                <span class="output-line">[OK] Ready. Cat is watching. 🐱</span><br>
+                <span class="prompt">root@hackercat:~$ </span><span class="cursor">█</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer"></div>
+
+    <!-- Modal container -->
+    <div id="modalContainer"></div>
+
+    <script>
+        // ===== DATA: All 100 Projects =====
+        const categories = [
+            { id: 'recon', name: '🔍 Reconnaissance', icon: '🔍', projects: [
+                    { num: 1, name: 'Subdomain Enumerator', icon: '🌐' },
+                    { num: 2, name: 'Port Scanner', icon: '🔌' },
+                    { num: 3, name: 'Web Technology Detector', icon: '🖥️' },
+                    { num: 4, name: 'Whois Lookup Tool', icon: '📋' },
+                    { num: 5, name: 'DNS Resolver & Record Harvester', icon: '📡' },
+                    { num: 6, name: 'Reverse IP Lookup', icon: '🔄' },
+                    { num: 7, name: 'SSL/TLS Certificate Analyzer', icon: '🔒' },
+                    { num: 8, name: 'Network Range to IP List Converter', icon: '📐' },
+                    { num: 9, name: 'Shodan Query Automation', icon: '🤖' },
+                    { num: 10, name: 'Google Dork Command-Line Tool', icon: '🔎' },
+                    { num: 11, name: 'Email Harvester', icon: '📧' },
+                    { num: 12, name: 'GitHub Secret Scanner', icon: '🐙' },
+                    { num: 13, name: 'Wayback Machine URL Fetcher', icon: '🏛️' },
+                    { num: 14, name: 'Cloud Storage Bucket Enumerator', icon: '☁️' },
+                    { num: 15, name: 'Link Extractor', icon: '🔗' }
+                ] },
+            { id: 'scanning', name: '🧪 Scanning & Vuln Detection', icon: '🧪', projects: [
+                    { num: 16, name: 'Basic Vulnerability Scanner', icon: '🛡️' },
+                    { num: 17, name: 'Open Directory Detector', icon: '📂' },
+                    { num: 18, name: 'CVE Checker by Service Banner', icon: '🏷️' },
+                    { num: 19, name: 'WordPress Security Scanner', icon: '🅿️' },
+                    { num: 20, name: 'SQLi Detection Fuzzer', icon: '💉' },
+                    { num: 21, name: 'XSS Scanner', icon: '✖️' },
+                    { num: 22, name: 'LFI/RFI Path Tester', icon: '📁' },
+                    { num: 23, name: 'Command Injection Detection', icon: '⌨️' },
+                    { num: 24, name: 'CRLF Injection Tester', icon: '↩️' },
+                    { num: 25, name: 'SSRF Endpoint Tester', icon: '🎯' },
+                    { num: 26, name: 'Open Redirect Validator', icon: '↗️' },
+                    { num: 27, name: 'Weak Cipher Scanner', icon: '🔓' },
+                    { num: 28, name: 'FTP Anonymous Login Checker', icon: '📦' },
+                    { num: 29, name: 'Default Credential Scanner', icon: '🔑' },
+                    { num: 30, name: 'HTTP Method Tester', icon: '📡' }
+                ] },
+            { id: 'exploit', name: '💣 Exploitation & Payloads', icon: '💣', projects: [
+                    { num: 31, name: 'Reverse Shell Generator', icon: '🐚' },
+                    { num: 32, name: 'Bind Shell Server', icon: '🔗' },
+                    { num: 33, name: 'Metasploit Payload Encoder', icon: '🔐' },
+                    { num: 34, name: 'SQLMap Tamper Script Writer', icon: '✏️' },
+                    { num: 35, name: 'Buffer Overflow Fuzzer', icon: '💥' },
+                    { num: 36, name: 'ROP Gadget Finder', icon: '🔬' },
+                    { num: 37, name: 'Web Shell Generator', icon: '🕸️' },
+                    { num: 38, name: 'File Upload Bypasser', icon: '📤' },
+                    { num: 39, name: 'Payload Encryptor/Decryptor', icon: '🧩' },
+                    { num: 40, name: 'Macro Generator for Office Docs', icon: '📄' }
+                ] },
+            { id: 'postexploit', name: '🔐 Post-Exploitation', icon: '🔐', projects: [
+                    { num: 41, name: 'Privilege Escalation Checker (Linux)', icon: '🐧' },
+                    { num: 42, name: 'Privilege Escalation Checker (Windows)', icon: '🪟' },
+                    { num: 43, name: 'Persistence via Scheduled Task', icon: '⏰' },
+                    { num: 44, name: 'Persistence via Cron', icon: '🕐' },
+                    { num: 45, name: 'Password Hash Dumper (Simulated)', icon: '🔑' },
+                    { num: 46, name: 'Mimikatz-like Credential Scraper', icon: '🧤' },
+                    { num: 47, name: 'Keylogger (Authorized Only)', icon: '⌨️' },
+                    { num: 48, name: 'Screenshot Capturer', icon: '📸' },
+                    { num: 49, name: 'Browser Credential Extractor', icon: '🌐' },
+                    { num: 50, name: 'Local Enumeration Report Generator', icon: '📊' }
+                ] },
+            { id: 'network', name: '🌐 Network & Traffic Manipulation', icon: '🌐', projects: [
+                    { num: 51, name: 'ARP Spoofer', icon: '🎭' },
+                    { num: 52, name: 'DNS Spoofer', icon: '🏷️' },
+                    { num: 53, name: 'Packet Sniffer', icon: '📡' },
+                    { num: 54, name: 'HTTP/HTTPS Proxy', icon: '🔄' },
+                    { num: 55, name: 'TCP Session Hijacker', icon: '🔀' },
+                    { num: 56, name: 'MAC Address Changer', icon: '🆔' },
+                    { num: 57, name: 'Deauthentication Attack Tool', icon: '📶' },
+                    { num: 58, name: 'Evil Twin Access Point', icon: '👯' },
+                    { num: 59, name: 'Netcat-like Relay', icon: '🔗' },
+                    { num: 60, name: 'ICMP Exfiltration Tunnel', icon: '🕳️' },
+                    { num: 61, name: 'DNS Tunneling Client', icon: '🔀' }
+                ] },
+            { id: 'webapp', name: '🕸️ Web Application Hacking', icon: '🕸️', projects: [
+                    { num: 62, name: 'Login Brute-Forcer', icon: '🔨' },
+                    { num: 63, name: 'CSRF Proof-of-Concept Generator', icon: '🎭' },
+                    { num: 64, name: 'JWT Token Cracker', icon: '🎫' },
+                    { num: 65, name: 'Session ID Entropy Checker', icon: '🎲' },
+                    { num: 66, name: 'CORS Misconfiguration Scanner', icon: '🔀' },
+                    { num: 67, name: 'GraphQL Introspection Dumper', icon: '📊' },
+                    { num: 68, name: 'API Rate Limit Tester', icon: '⏱️' },
+                    { num: 69, name: 'Clickjacking Frame-Buster Buster', icon: '🖼️' },
+                    { num: 70, name: 'HTTP Request Smuggling Detector', icon: '📦' },
+                    { num: 71, name: 'NoSQL Injection Tester', icon: '🗄️' }
+                ] },
+            { id: 'forensics', name: '🔬 Forensics & Reverse Engineering', icon: '🔬', projects: [
+                    { num: 72, name: 'PE File Parser', icon: '📦' },
+                    { num: 73, name: 'ELF File Analyzer', icon: '🐧' },
+                    { num: 74, name: 'String Extractor', icon: '📝' },
+                    { num: 75, name: 'Simple Debugger (Linux)', icon: '🐛' },
+                    { num: 76, name: 'Hash Calculator', icon: '#️⃣' },
+                    { num: 77, name: 'Memory Dump Analyzer', icon: '🧠' },
+                    { num: 78, name: 'Log Parser for Auth Attacks', icon: '📋' },
+                    { num: 79, name: 'PCAP to HTTP Request Reconstructor', icon: '📡' },
+                    { num: 80, name: 'Registry Hive Viewer', icon: '📂' }
+                ] },
+            { id: 'defense', name: '🛡️ Defense & Hardening Tools', icon: '🛡️', projects: [
+                    { num: 81, name: 'File Integrity Monitor', icon: '📁' },
+                    { num: 82, name: 'Honeypot (Low-Interaction)', icon: '🍯' },
+                    { num: 83, name: 'Port Knocking Daemon', icon: '🚪' },
+                    { num: 84, name: 'Ransomware Simulation Tool', icon: '🔒' },
+                    { num: 85, name: 'SQL Injection Firewall', icon: '🔥' },
+                    { num: 86, name: 'Fail2ban-like Log Watcher', icon: '👀' },
+                    { num: 87, name: 'SSH Brute-Force Blocker', icon: '🚫' },
+                    { num: 88, name: 'Secure Delete Utility', icon: '🗑️' },
+                    { num: 89, name: 'Password Strength Tester', icon: '💪' },
+                    { num: 90, name: 'System Call Logger', icon: '📞' }
+                ] },
+            { id: 'automation', name: '🤖 Automation & Utility Scripts', icon: '🤖', projects: [
+                    { num: 91, name: 'Wordlist Generator', icon: '📚' },
+                    { num: 92, name: 'Base64/URL/Hex Encoder/Decoder', icon: '🔣' },
+                    { num: 93, name: 'IP Geolocation Mapper', icon: '🗺️' },
+                    { num: 94, name: 'Leaked Password Checker (Offline)', icon: '🔍' },
+                    { num: 95, name: 'SSH Key Pair Manager', icon: '🔐' },
+                    { num: 96, name: 'Tor Proxy Wrapper', icon: '🧅' },
+                    { num: 97, name: 'Automatic Report Formatter', icon: '📄' },
+                    { num: 98, name: 'API Version Fuzzer', icon: '🎯' },
+                    { num: 99, name: 'Command-Line Pastebin Scraper', icon: '📋' },
+                    { num: 100, name: 'Cron Job Monitoring Script', icon: '⏰' }
+                ] }
+        ];
+
+        // Flatten all projects
+        const allProjects = categories.flatMap(cat => cat.projects);
+
+        // ===== STATE =====
+        let activeCategory = 'all';
+        let walletConnected = false;
+        let catClickCount = 0;
+
+        // ===== MATRIX RAIN =====
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        let matrixChars = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃ0123456789ABCDEFabcdefｦｧｨｩｪｫｬｭｮｯｰﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ<>/{}[]|\\:;';
+        let drops = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const colCount = Math.floor(canvas.width / 20);
+            drops = [];
+            for (let i = 0; i < colCount; i++) {
+                drops[i] = Math.random() * canvas.height;
+            }
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10,10,15,0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '14px "Courier New", monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                const x = i * 20;
+                const y = drops[i];
+                const gradient = ctx.createLinearGradient(x, y - 20, x, y + 20);
+                gradient.addColorStop(0, 'rgba(0,255,65,0)');
+                gradient.addColorStop(0.5, 'rgba(0,255,65,0.5)');
+                gradient.addColorStop(1, 'rgba(0,255,65,0)');
+                ctx.fillStyle = gradient;
+                ctx.fillText(char, x, y);
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i] += Math.random() * 1.5 + 0.5;
+            }
+            requestAnimationFrame(drawMatrix);
+        }
+        drawMatrix();
+
+        // ===== RENDER CATEGORY TABS =====
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            let html = `<button class="cat-tab ${activeCategory === 'all' ? 'active' : ''}" onclick="setCategory('all')">
+            🗂️ ALL <span class="badge">100</span></button>`;
+            categories.forEach(cat => {
+                html += `<button class="cat-tab ${activeCategory === cat.id ? 'active' : ''}" onclick="setCategory('${cat.id}')">
+            ${cat.icon} ${cat.name.split(' ').slice(0,2).join(' ')} <span class="badge">${cat.projects.length}</span></button>`;
+            });
+            tabsContainer.innerHTML = html;
+        }
+
+        // ===== RENDER PROJECTS =====
+        function renderProjects(projectsToRender) {
+            const list = document.getElementById('projectList');
+            if (projectsToRender.length === 0) {
+                list.innerHTML =
+                    '<div style="text-align:center;padding:40px;color:var(--text-dim);font-family:var(--font-mono);">🐱 No projects found... try a different search!<br><span style="font-size:0.7rem;">The cat is judging your search query.</span></div>';
+                document.getElementById('filteredCount').textContent = '0';
+                return;
+            }
+            let html = '';
+            projectsToRender.forEach((p, index) => {
+                html += `
+            <div class="project-item" style="animation-delay:${index * 0.015}s;" onclick="showProjectDetail(${p.num})" title="Click for details">
+              <span class="project-num">#${p.num}</span>
+              <span class="project-icon">${p.icon}</span>
+              <span class="project-name">${p.name}</span>
+              <span style="color:var(--text-dim);font-size:0.65rem;">↗</span>
+            </div>`;
+            });
+            list.innerHTML = html;
+            document.getElementById('filteredCount').textContent = projectsToRender.length;
+            // Re-trigger animations
+            list.querySelectorAll('.project-item').forEach(el => {
+                el.style.opacity = '0';
+                requestAnimationFrame(() => { el.style.opacity = '1'; });
+            });
+        }
+
+        function setCategory(catId) {
+            activeCategory = catId;
+            renderCategoryTabs();
+            document.getElementById('searchInput').value = '';
+            filterProjects();
+            updateTerminal(`switched to category: ${catId === 'all' ? 'ALL_PROJECTS' : catId}`);
+        }
+
+        function filterProjects() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            let source = activeCategory === 'all' ? allProjects :
+                categories.find(c => c.id === activeCategory)?.projects || allProjects;
+            if (query) {
+                source = source.filter(p =>
+                    p.name.toLowerCase().includes(query) ||
+                    p.num.toString().includes(query)
+                );
+            }
+            renderProjects(source);
+        }
+
+        function showProjectDetail(num) {
+            const project = allProjects.find(p => p.num === num);
+            if (!project) return;
+            const cat = categories.find(c => c.projects.some(p => p.num === num));
+            showToast(`📋 #${num}: ${project.name} — Category: ${cat?.name || 'Unknown'} | Ethical use only! 🛡️`);
+            updateTerminal(`viewed project #${num}: ${project.name}`);
+            // Ripple effect on click
+            addRipple(event);
+        }
+
+        // ===== WALLET CONNECT (FUNNY FAKE) =====
+        function toggleWallet() {
+            const btn = document.getElementById('btnConnect');
+            const addrSpan = document.getElementById('walletAddress');
+            if (!walletConnected) {
+                // Fake connect
+                const fakeAddresses = [
+                    '0xCat...H4CK', '0xNyan...C0DE', '0xMeow...W3B3', '0xPurr...ETH',
+                    '0xKitty...H4SH', '0xPawz...NFT', '0xWhisk...DEFI', '0xFeli...DAO'
+                ];
+                const addr = fakeAddresses[Math.floor(Math.random() * fakeAddresses.length)];
+                addrSpan.textContent = addr;
+                addrSpan.classList.add('show');
+                btn.textContent = '🔌 Disconnect';
+                btn.classList.add('connected');
+                walletConnected = true;
+                updateTerminal(`wallet connected: ${addr} | MeowChain Network | Balance: 9,001 🐱`);
+                showToast('🦊 Wallet Connected! You have 9,001 $MEOW tokens! (not real, obviously)');
+            } else {
+                addrSpan.classList.remove('show');
+                btn.textContent = '⚡ Connect Wallet';
+                btn.classList.remove('connected');
+                walletConnected = false;
+                updateTerminal('wallet disconnected. Cat is sad. 😿');
+                showToast('👋 Wallet disconnected. Your $MEOW tokens are safe... in imagination land.');
+            }
+        }
+
+        // ===== TOAST SYSTEM =====
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 3000);
+        }
+
+        // ===== TERMINAL UPDATE =====
+        function updateTerminal(message) {
+            const body = document.getElementById('terminalBody');
+            const lines = body.innerHTML.split('<br>');
+            // Keep last 8 lines + new one
+            const newLine =
+                `<span class="prompt">root@hackercat:~$</span> <span class="output-highlight">${escapeHTML(message)}</span>`;
+            lines.push(newLine);
+            if (lines.length > 10) lines.splice(0, lines.length - 10);
+            body.innerHTML = lines.join('<br>') + '<br><span class="prompt">root@hackercat:~$ </span><span class="cursor">█</span>';
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ===== RIPPLE EFFECT =====
+        function addRipple(e) {
+            const target = e.target.closest('.project-item') || e.target;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            const rect = target.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            target.style.position = target.style.position || 'relative';
+            target.style.overflow = 'hidden';
+            target.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // ===== CAT CLICK EASTER EGG =====
+        document.getElementById('catMascot').addEventListener('click', function(e) {
+            catClickCount++;
+            const catEmojis = ['🐱‍💻', '🐱‍👤', '🐱‍🚀', '🐱‍🐉', '🐱‍👓', '😼', '🙀', '😾', '😹', '🐈'];
+            const randomCat = catEmojis[Math.floor(Math.random() * catEmojis.length)];
+            this.textContent = randomCat;
+
+            if (catClickCount === 5) {
+                showModal('🐱 YOU FOUND THE CAT EASTER EGG! 🐱',
+                    'The hacker cat is pleased. You have unlocked the secret "Nyan Exploit" mode. All your base are belong to cat. Click OK to receive 1,000,000 imaginary $MEOW tokens.',
+                    true);
+                document.body.classList.add('easter-egg-activated');
+                setTimeout(() => document.body.classList.remove('easter-egg-activated'), 600);
+            } else if (catClickCount === 10) {
+                showModal('🌟 ULTRA RARE CAT UNLOCKED 🌟',
+                    'You have awakened the legendary "Keyboard Cat Hacker Supreme". It hacks... with music. 🎹🐱',
+                    true);
+                catClickCount = 0;
+            } else if (catClickCount % 3 === 0) {
+                showToast(`🐱 Cat click #${catClickCount}! The cat is watching you code... approvingly.`);
+            }
+            setTimeout(() => {
+                if (catClickCount < 5 || catClickCount > 6) {
+                    document.getElementById('catMascot').textContent = '🐱‍💻';
+                }
+            }, 800);
+            addRipple(e);
+        });
+
+        // ===== MODAL =====
+        function showModal(title, message, isEasterEgg = false) {
+            const container = document.getElementById('modalContainer');
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+            <div class="modal">
+              <div class="big-cat">${isEasterEgg ? '🐱‍🚀' : '🐱'}</div>
+              <h3>${title}</h3>
+              <p>${message}</p>
+              <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">
+                ${isEasterEgg ? '🚀 CLAIM $MEOW' : 'OK, Got it!'}
+              </button>
+            </div>`;
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) modal.remove();
+            });
+            container.appendChild(modal);
+            if (isEasterEgg) {
+                updateTerminal('🌟 EASTER EGG ACTIVATED! +1,000,000 $MEOW (imaginary)');
+            }
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+K or / to focus search
+            if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && document.activeElement !== document
+                    .getElementById('searchInput'))) {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            // Escape to clear search
+            if (e.key === 'Escape') {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchInput').blur();
+                filterProjects();
+                updateTerminal('search cleared');
+            }
+            // Number keys 1-9 to switch categories
+            if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+                e.preventDefault();
+                const idx = parseInt(e.key) - 1;
+                if (idx < categories.length) {
+                    setCategory(categories[idx].id);
+                }
+            }
+            if (e.ctrlKey && e.key === '0') {
+                e.preventDefault();
+                setCategory('all');
+            }
+        });
+
+        // ===== INITIAL RENDER =====
+        function init() {
+            renderCategoryTabs();
+            renderProjects(allProjects);
+            // Auto-scroll terminal message
+            setTimeout(() => {
+                updateTerminal('system ready | press / to search | Ctrl+1-9 for categories | click cat for surprises');
+            }, 1500);
+        }
+
+        // ===== HANDLE WINDOW CLICK FOR MODAL OUTSIDE =====
+        document.addEventListener('click', function(e) {
+            const overlay = e.target.closest('.modal-overlay');
+            if (overlay && e.target === overlay) {
+                overlay.remove();
+            }
+        });
+
+        // ===== INIT =====
+        init();
+
+        console.log(`
+        🐱‍💻  HACKER CAT WEB3 - LOADED SUCCESSFULLY  🐱‍💻
+        ╔══════════════════════════════════════╗
+        ║   100 Ethical Hacking Projects       ║
+        ║   All in one HTML/CSS/JS file        ║
+        ║   Made with 💚 by Hacker Cat         ║
+        ║   GitHub: MMDKhaki                   ║
+        ╚══════════════════════════════════════╝
+        Tips:
+        - Click the cat multiple times for surprises!
+        - Press "/" to quickly search projects
+        - Ctrl+1-9 to jump between categories
+        - "Connect Wallet" is a fun joke (no real crypto)
+        - All projects are ETHICAL USE ONLY
+        Stay curious, stay legal, stay secure! 🛡️
+            `);
+    </script>
+</body>
+</html>
