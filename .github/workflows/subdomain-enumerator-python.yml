@@ -75,7 +75,7 @@ jobs:
     
     - name: Create GitHub issue on new findings (optional)
       if: always()
-      uses: actions/github-script@v6
+      uses: actions/github-script@v9
       with:
         script: |
           const fs = require('fs');
