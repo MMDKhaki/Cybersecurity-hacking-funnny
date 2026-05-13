@@ -1,0 +1,114 @@
+name: Bash Subdomain Enumerator
+
+on:
+  schedule:
+    # Run weekly on Sunday at 3 AM
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Target domain'
+        required: true
+        default: 'example.com'
+      wordlist:
+        description: 'Custom wordlist URL (optional)'
+        required: false
+        default: ''
+      threads:
+        description: 'Number of threads'
+        required: false
+        default: '50'
+      securitytrails_key:
+        description: 'SecurityTrails API key (optional)'
+        required: false
+      virustotal_key:
+        description: 'VirusTotal API key (optional)'
+        required: false
+
+jobs:
+  enumerate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y dnsutils curl jq parallel
+    
+    - name: Make script executable
+      run: chmod +x subdomain_enum.sh
+    
+    - name: Create wordlist file
+      if: github.event.inputs.wordlist != ''
+      run: |
+        curl -L "${{ github.event.inputs.wordlist }}" -o custom_wordlist.txt
+    
+    - name: Run subdomain enumeration
+      env:
+        ST_API_KEY: ${{ secrets.SECURITYTRAILS_API_KEY || github.event.inputs.securitytrails_key }}
+        VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY || github.event.inputs.virustotal_key }}
+      run: |
+        ./subdomain_enum.sh \
+          -d "${{ github.event.inputs.domain }}" \
+          ${CUSTOM_WORDLIST:+-w custom_wordlist.txt} \
+          -t "${{ github.event.inputs.threads }}" \
+          ${ST_API_KEY:+--st-api $ST_API_KEY} \
+          ${VT_API_KEY:+--vt-api $VT_API_KEY} \
+          -o final_results.txt \
+          2>&1 | tee results.log
+    
+    - name: Count subdomains
+      id: count
+      run: |
+        if [ -f final_results.txt ]; then
+          COUNT=$(wc -l < final_results.txt)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+        else
+          echo "count=0" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: bash-subdomain-results
+        path: |
+          final_results.txt
+          results.log
+        retention-days: 30
+    
+    - name: Create summary
+      run: |
+        {
+          echo "## Subdomain Enumeration Results for ${{ github.event.inputs.domain }}"
+          echo ""
+          echo "### Summary"
+          echo "- **Domain:** ${{ github.event.inputs.domain }}"
+          echo "- **Threads:** ${{ github.event.inputs.threads }}"
+          echo "- **Total Subdomains Found:** ${{ steps.count.outputs.count }}"
+          echo "- **Execution Time:** $(date)"
+          echo ""
+          if [ -f final_results.txt ] && [ -s final_results.txt ]; then
+            echo "### Subdomains List"
+            echo '```'
+            cat final_results.txt
+            echo '```'
+          else
+            echo "### No subdomains found"
+          fi
+        } >> $GITHUB_STEP_SUMMARY
+    
+    - name: Upload to AWS S3 (optional)
+      if: secrets.AWS_S3_BUCKET != ''
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Upload to S3
+      if: secrets.AWS_S3_BUCKET != ''
+      run: |
+        aws s3 cp final_results.txt s3://${{ secrets.AWS_S3_BUCKET }}/subdomains/${{ github.event.inputs.domain }}-$(date +%Y%m%d).txt

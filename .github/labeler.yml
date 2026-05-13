@@ -1,0 +1,19 @@
+python:
+  - '**/*.py'
+  - '.github/workflows/*python*.yml'
+
+go:
+  - '**/*.go'
+  - '.github/workflows/*go*.yml'
+
+nodejs:
+  - '**/*.js'
+  - '.github/workflows/*nodejs*.yml'
+
+bash:
+  - '**/*.sh'
+  - '.github/workflows/*bash*.yml'
+
+documentation:
+  - '**/*.md'
+  - '**/*.txt'

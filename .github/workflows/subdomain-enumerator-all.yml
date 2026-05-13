@@ -1,0 +1,165 @@
+name: Multi-Language Subdomain Enumerator
+
+on:
+  schedule:
+    # Run once per day
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Target domain'
+        required: true
+        default: 'example.com'
+      languages:
+        description: 'Languages to run (python,go,nodejs,bash)'
+        required: false
+        default: 'python,go,nodejs,bash'
+      wordlist_url:
+        description: 'Custom wordlist URL (optional)'
+        required: false
+        default: ''
+
+jobs:
+  enumerate-all:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: 
+          - python
+          - go
+          - nodejs
+          - bash
+        exclude:
+          - language: ${{ !contains(github.event.inputs.languages, 'python') && 'python' }}
+          - language: ${{ !contains(github.event.inputs.languages, 'go') && 'go' }}
+          - language: ${{ !contains(github.event.inputs.languages, 'nodejs') && 'nodejs' }}
+          - language: ${{ !contains(github.event.inputs.languages, 'bash') && 'bash' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      if: matrix.language == 'python'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Setup Go
+      if: matrix.language == 'go'
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Setup Node.js
+      if: matrix.language == 'nodejs'
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install Bash dependencies
+      if: matrix.language == 'bash'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y dnsutils curl jq parallel
+    
+    - name: Install language-specific dependencies
+      run: |
+        if [ "${{ matrix.language }}" = "python" ]; then
+          pip install dnspython requests
+        elif [ "${{ matrix.language }}" = "go" ]; then
+          go mod init subdomain-enum || true
+          go get github.com/miekg/dns
+          go build -o subdomain-enum subdomain_enum.go
+        elif [ "${{ matrix.language }}" = "nodejs" ]; then
+          npm init -y
+          npm install commander
+        elif [ "${{ matrix.language }}" = "bash" ]; then
+          chmod +x subdomain_enum.sh
+        fi
+    
+    - name: Create custom wordlist
+      if: github.event.inputs.wordlist_url != ''
+      run: |
+        curl -L "${{ github.event.inputs.wordlist_url }}" -o custom_wordlist.txt
+    
+    - name: Run ${{ matrix.language }} enumerator
+      env:
+        ST_API_KEY: ${{ secrets.SECURITYTRAILS_API_KEY }}
+        VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+      run: |
+        case "${{ matrix.language }}" in
+          python)
+            python subdomain_enum.py \
+              -d "${{ github.event.inputs.domain }}" \
+              ${CUSTOM_WORDLIST:+-w custom_wordlist.txt} \
+              ${ST_API_KEY:+--st-api $ST_API_KEY} \
+              ${VT_API_KEY:+--vt-api $VT_API_KEY} \
+              | tee results-${{ matrix.language }}.txt
+            ;;
+          go)
+            ./subdomain-enum \
+              -d "${{ github.event.inputs.domain }}" \
+              ${CUSTOM_WORDLIST:+-w custom_wordlist.txt} \
+              ${ST_API_KEY:+--st-api $ST_API_KEY} \
+              ${VT_API_KEY:+--vt-api $VT_API_KEY} \
+              | tee results-${{ matrix.language }}.txt
+            ;;
+          nodejs)
+            node subdomain_enum.js \
+              -d "${{ github.event.inputs.domain }}" \
+              ${CUSTOM_WORDLIST:+-w custom_wordlist.txt} \
+              ${ST_API_KEY:+--st-api $ST_API_KEY} \
+              ${VT_API_KEY:+--vt-api $VT_API_KEY} \
+              | tee results-${{ matrix.language }}.txt
+            ;;
+          bash)
+            ./subdomain_enum.sh \
+              -d "${{ github.event.inputs.domain }}" \
+              ${CUSTOM_WORDLIST:+-w custom_wordlist.txt} \
+              ${ST_API_KEY:+--st-api $ST_API_KEY} \
+              ${VT_API_KEY:+--vt-api $VT_API_KEY} \
+              -o results-${{ matrix.language }}.txt
+            ;;
+        esac
+    
+    - name: Upload ${{ matrix.language }} results
+      uses: actions/upload-artifact@v3
+      with:
+        name: results-${{ matrix.language }}
+        path: results-${{ matrix.language }}.txt
+        retention-days: 7
+    
+    - name: Compare results across languages
+      if: always()
+      run: |
+        echo "## Cross-Language Comparison for ${{ github.event.inputs.domain }}" > comparison.md
+        echo "" >> comparison.md
+        echo "| Language | Subdomains Found |" >> comparison.md
+        echo "|----------|-----------------|" >> comparison.md
+        
+        for lang in python go nodejs bash; do
+          if [ -f results-$lang.txt ]; then
+            COUNT=$(grep -c "Found:" results-$lang.txt || echo "0")
+            echo "| $lang | $COUNT |" >> comparison.md
+          fi
+        done
+        
+        cat comparison.md >> $GITHUB_STEP_SUMMARY
+    
+    - name: Send email notification
+      if: always() && secrets.SMTP_SERVER != ''
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: ${{ secrets.SMTP_PORT }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "Subdomain Enumeration Results for ${{ github.event.inputs.domain }}"
+        to: ${{ secrets.NOTIFICATION_EMAIL }}
+        from: GitHub Actions
+        body: |
+          Subdomain enumeration completed for ${{ github.event.inputs.domain }}
+          Check the workflow run for details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
